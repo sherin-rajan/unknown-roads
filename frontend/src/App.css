@@ -265,7 +265,24 @@
 .destination-search input::placeholder {
   color: #929b93;
 }
+.sort-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  color: #56645a;
+  font-size: 14px;
+}
 
+.sort-control select {
+  padding: 10px 14px;
+  border: 1px solid #d8dfd8;
+  border-radius: 6px;
+  background: white;
+  color: #294b38;
+  font: inherit;
+  cursor: pointer;
+}
 
 @media (max-width: 900px) {
   .destination-grid {

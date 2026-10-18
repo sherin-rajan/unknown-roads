@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
+import DestinationDetails from './pages/DestinationDetails'
 import './App.css'
 
 function App() {
@@ -6,49 +8,53 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
-
-  
-useEffect(() => {
-  setLoading(true)
-
-  const params = new URLSearchParams()
-
-  if (selectedCategory) {
-    params.append('category', selectedCategory)
-  }
-
-  if (searchTerm.trim()) {
-    params.append('search', searchTerm.trim())
-  }
-
-  const query = params.toString()
-  const url = query
-    ? `http://127.0.0.1:8000/api/destinations/?${query}`
-    : 'http://127.0.0.1:8000/api/destinations/'
-
-  fetch(url)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch destinations')
-      }
-      return response.json()
-    })
-    .then((data) => {
-      setDestinations(data.results)
-    })
-    .catch((error) => {
-      console.error('Error fetching destinations:', error)
-      setDestinations([])
-    })
-    .finally(() => {
-      setLoading(false)
-    })
-}, [selectedCategory, searchTerm])
+  const [sortBy, setSortBy] = useState('featured')
 
 
+  useEffect(() => {
+    setLoading(true)
 
-  return (
-    <div className="app">
+    const params = new URLSearchParams()
+    params.append('ordering', sortBy)
+
+    if (selectedCategory) {
+      params.append('category', selectedCategory)
+    }
+
+    if (searchTerm.trim()) {
+      params.append('search', searchTerm.trim())
+    }
+
+    const query = params.toString()
+    const url = query
+      ? `http://127.0.0.1:8000/api/destinations/?${query}`
+      : 'http://127.0.0.1:8000/api/destinations/'
+
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch destinations')
+        }
+        return response.json()
+      })
+      .then((data) => {
+        setDestinations(data.results)
+      })
+      .catch((error) => {
+        console.error('Error fetching destinations:', error)
+        setDestinations([])
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [selectedCategory, searchTerm, sortBy])
+
+
+return (
+  <Routes>
+    <Route path="/" element={
+      <div className="app">
+        <div className="app">
       <nav className="navbar">
         <h1 className="logo">Via Maris<span>.</span></h1>
 
@@ -107,6 +113,19 @@ useEffect(() => {
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
             />
+          </div>
+          <div className="sort-control">
+            <label htmlFor="sortBy">Sort by:</label>
+
+            <select
+              id="sortBy"
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value)}
+            >
+              <option value="featured">Featured</option>
+              <option value="newest">Newest</option>
+              <option value="name">Name (A–Z)</option>
+            </select>
           </div>
 
           <div className="category-filters">
@@ -191,7 +210,15 @@ useEffect(() => {
 
       </main>
     </div>
-  )
+      </div>
+    } />
+
+    <Route
+      path="/destinations/:id"
+      element={<DestinationDetails />}
+    />
+  </Routes>
+)
 }
 
 export default App
