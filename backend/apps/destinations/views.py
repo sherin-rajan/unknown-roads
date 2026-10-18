@@ -11,7 +11,16 @@ from .serializers import DestinationSerializer, CategorySerializer
 @api_view(['GET','POST'])
 def destination_list(request):
     if request.method == 'GET':
-        destinations = Destination.objects.all()
+        destinations = Destination.objects.all().order_by('-is_featured','-created_at')
+
+        ordering = request.query_params.get('ordering')
+
+        if ordering == 'featured':
+            destinations = destinations.order_by('-is_featured', '-created_at')
+        elif ordering == 'newest':
+            destinations = destinations.order_by('-created_at')
+        elif ordering == 'name':
+            destinations = destinations.order_by('name')
 
         #filter by category
         category_name = request.query_params.get('category')
@@ -19,6 +28,12 @@ def destination_list(request):
             destinations = destinations.filter(
                 categories__name__iexact=category_name
             ).distinct()
+
+        state_name = request.query_params.get('state')
+        if state_name:
+            destinations = destinations.filter(
+                state__iexact=state_name
+            )
 
         # Search destinations by name or location
         search_query = request.query_params.get('search')
@@ -69,6 +84,11 @@ def destination_detail(request, pk):
         destination.delete()
         return Response({"message": "Destination deleted successfully"}, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def featured_destinations(request):
+    destinations = Destination.objects.filter(is_featured=True ).order_by('-created_at')
+    serializer = DestinationSerializer(destinations, many=True)
+    return Response(serializer.data)
 
 @api_view(['GET', 'POST'])
 def category_list(request):

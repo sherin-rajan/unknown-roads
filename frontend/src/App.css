@@ -1,0 +1,157 @@
+
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 7%;
+  background: #faf9f5;
+}
+
+.logo {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+}
+
+.logo span {
+  color: #b77b45;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-links a {
+  color: #56645a;
+  font-size: 14px;
+}
+
+.nav-links a:hover {
+  color: #b77b45;
+}
+
+.nav-button,
+.hero-button {
+  display: inline-block;
+  border: none;
+  border-radius: 6px;
+  padding: 13px 20px;
+  background: #294b38;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hero {
+  min-height: 540px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 80px 10%;
+  background:
+    linear-gradient(90deg, rgba(15, 35, 25, 0.82), rgba(15, 35, 25, 0.15)),
+    url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1800&q=85')
+    center 48% / cover no-repeat;
+  color: white;
+}
+
+.hero-tagline,
+.section-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.hero-tagline {
+  color: #e8c9a5;
+}
+
+.hero h2 {
+  margin: 16px 0;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(42px, 6vw, 72px);
+  line-height: 1.12;
+}
+
+.hero-description {
+  max-width: 470px;
+  margin: 8px 0 28px;
+  color: #f0f0e9;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.hero-button {
+  background: #e4b784;
+  color: #23352b;
+}
+
+.hero-button:hover {
+  background: #f0cca5;
+}
+
+.intro {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 75px 24px;
+  text-align: center;
+}
+
+.section-label {
+  color: #a66b3e;
+}
+
+.intro h2 {
+  margin: 16px 0;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4vw, 42px);
+}
+
+.intro > p:last-child {
+  color: #68736b;
+  line-height: 1.8;
+}
+
+@media (max-width: 700px) {
+  .navbar {
+    flex-wrap: wrap;
+    padding: 18px 5%;
+  }
+
+  .logo {
+    font-size: 26px;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 24px;
+  }
+
+  .nav-button {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .hero {
+    min-height: 480px;
+    padding: 60px 7%;
+  }
+
+  .hero-description {
+    font-size: 14px;
+  }
+}
