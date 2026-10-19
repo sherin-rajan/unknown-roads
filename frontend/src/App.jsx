@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Link} from 'react-router-dom'
 import DestinationDetails from './pages/DestinationDetails'
+import { getDestinations } from './services/destinationService'
 import './App.css'
 
 function App() {
@@ -8,47 +9,49 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState('featured')
 
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    setDebouncedSearchTerm(searchTerm)
+  }, 400)
+
+  return () => {
+    clearTimeout(timer)
+  }
+  }, [searchTerm])
 
   useEffect(() => {
-    setLoading(true)
+    const fetchDestinations = async () => {
+      setLoading(true)
 
-    const params = new URLSearchParams()
-    params.append('ordering', sortBy)
+      try {
+        const params = {}
 
-    if (selectedCategory) {
-      params.append('category', selectedCategory)
-    }
-
-    if (searchTerm.trim()) {
-      params.append('search', searchTerm.trim())
-    }
-
-    const query = params.toString()
-    const url = query
-      ? `http://127.0.0.1:8000/api/destinations/?${query}`
-      : 'http://127.0.0.1:8000/api/destinations/'
-
-    fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch destinations')
+        if (selectedCategory) {
+          params.category = selectedCategory
         }
-        return response.json()
-      })
-      .then((data) => {
-        setDestinations(data.results)
-      })
-      .catch((error) => {
+
+        if (debouncedSearchTerm.trim()) {
+          params.search = debouncedSearchTerm.trim()
+        }
+
+        params.ordering = sortBy
+
+        const response = await getDestinations(params)
+
+        setDestinations(response.data.results)
+      } catch (error) {
         console.error('Error fetching destinations:', error)
         setDestinations([])
-      })
-      .finally(() => {
+      } finally {
         setLoading(false)
-      })
-  }, [selectedCategory, searchTerm, sortBy])
+      }
+    }
 
+    fetchDestinations()
+  }, [selectedCategory, debouncedSearchTerm, sortBy])
 
 return (
   <Routes>
@@ -167,7 +170,7 @@ return (
 
           <div className="destination-grid">
             {destinations.map((destination) => (
-              <article className="destination-card" key={destination.id}>
+              <Link to={`/destinations/${destination.id}`} className="destination-card" key={destination.id}>
                 <img
                   src={
                     destination.image
@@ -197,7 +200,7 @@ return (
                     ))}
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
 
