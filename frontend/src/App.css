@@ -562,3 +562,45 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  margin: 24px 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #faf9f6;
+}
+
+.empty-state h3 {
+  margin-bottom: 12px;
+  font-size: 1.4rem;
+}
+
+.empty-state p {
+  max-width: 520px;
+  margin: 0 auto 24px;
+  line-height: 1.7;
+  color: #666;
+}
+
+.clear-filters-button {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 6px;
+  background: #243b35;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.clear-filters-button:hover {
+  background: #36564d;
+}
+
+.clear-filters-button:focus-visible {
+  outline: 3px solid #8da99e;
+  outline-offset: 3px;
+}
+

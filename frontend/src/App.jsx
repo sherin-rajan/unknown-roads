@@ -231,11 +231,29 @@ function App() {
                   <p className="empty-message">
                     Loading destinations...
                   </p>
+
                 ) : destinations.length === 0 ? (
-                  <p className="empty-message">
-                    No destinations found.
-                  </p>
+                  <div className="empty-state">
+                    <h3>No destinations found</h3>
+                    <p>
+                      We couldn't find any destinations matching your search.
+                      Try changing your search or filters to discover more places.
+                    </p>
+                    <button
+                      className="clear-filters-button"
+                      onClick={() => {
+                        setSearchTerm('')
+                        setDebouncedSearchTerm('')
+                        setSelectedCategory('')
+                        setSortBy('featured')
+                        setPage(1)
+                      }}
+                    >
+                      Clear Search & Filters
+                    </button>
+                  </div>
                 ) : (
+
                   <div className="destination-grid">
                     {destinations.map((destination) => (
                       <Link
