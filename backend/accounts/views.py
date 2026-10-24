@@ -17,7 +17,7 @@ def register(request):
         user = serializer.save()
 
         return Response({
-            "message": "Your Via Maris account has been created successfully.",
+            "message": "Your Unknown Roads account has been created successfully.",
             "user": {
                 "id": user.id,
                 "username": user.username,

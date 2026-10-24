@@ -99,7 +99,7 @@ function DestinationDetails() {
         </Link>
 
         <Link to="/" className="details-brand">
-          Via Maris<span>.</span>
+          Unknown Roads<span>.</span>
         </Link>
       </div>
 
