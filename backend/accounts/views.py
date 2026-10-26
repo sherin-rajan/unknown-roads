@@ -6,6 +6,9 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import RegisterSerializer, CurrentUserSerializer
+from .models import UserProfile
+from .profile_serializers import CustomerProfileSerializer
+from .permissions import IsCustomer
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -48,4 +51,28 @@ def logout_view(request):
     return Response(
         {"message": "Logout successful."},
         status=status.HTTP_200_OK
+    )
+
+@api_view(["GET", "PATCH", "PUT"])
+@permission_classes([IsAuthenticated, IsCustomer])
+def customer_profile(request):
+    profile = request.user.profile
+
+    if request.method == "GET":
+        serializer = CustomerProfileSerializer(profile)
+        return Response(serializer.data)
+
+    serializer = CustomerProfileSerializer(
+        profile,
+        data=request.data,
+        partial=(request.method == "PATCH")
+    )
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+
+    return Response(
+        serializer.errors,
+        status=status.HTTP_400_BAD_REQUEST
     )
