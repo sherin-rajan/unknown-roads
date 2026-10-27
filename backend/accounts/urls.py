@@ -12,4 +12,7 @@ urlpatterns = [
     path("me/", views.current_user, name="current-user"),
     path("logout/", views.logout_view, name="logout"),
     path("profile/", views.customer_profile, name="customer-profile"),
+    path("change-password/", views.change_password, name="change-password"),
+    path("favorites/", views.customer_favorites, name="customer-favorites"),
+    path("favorites/<int:favorite_id>/", views.remove_favorite, name="remove-favorite",),
 ]
