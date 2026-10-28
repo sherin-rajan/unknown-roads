@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from ..models import UserProfile
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -10,6 +9,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         validators=[validate_password],
         style={"input_type": "password"}
     )
+
     password2 = serializers.CharField(
         write_only=True,
         required=True,
@@ -27,9 +27,35 @@ class RegisterSerializer(serializers.ModelSerializer):
             "password",
             "password2",
         ]
+        read_only_fields = ["id"]
+
+    def validate_username(self, value):
+        value = value.strip()
+
+        if len(value) < 3:
+            raise serializers.ValidationError(
+                "Username must contain at least 3 characters."
+            )
+
+        if len(value) > 150:
+            raise serializers.ValidationError(
+                "Username cannot exceed 150 characters."
+            )
+
+        if User.objects.filter(username__iexact=value).exists():
+            raise serializers.ValidationError(
+                "This username is already taken."
+            )
+
+        return value
 
     def validate_email(self, value):
         value = value.strip().lower()
+
+        if not value:
+            raise serializers.ValidationError(
+                "Email address is required."
+            )
 
         if User.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError(
@@ -49,10 +75,14 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop("password2")
         password = validated_data.pop("password")
+
         user = User(**validated_data)
         user.set_password(password)
-        user.save() # The signal creates a customer profile automatically.
+        user.save()
+
+        # The post_save signal creates the customer profile.
         return user
+
 
 class CurrentUserSerializer(serializers.ModelSerializer):
     role = serializers.CharField(
