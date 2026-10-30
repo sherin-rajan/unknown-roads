@@ -1,10 +1,12 @@
+
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { loginUser } from '../services/authService'
+import { useAuth } from '../context/AuthContext'
 
 function Login() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { login } = useAuth()
 
   const [credentials, setCredentials] = useState({
     username: '',
@@ -27,7 +29,7 @@ function Login() {
     setLoading(true)
 
     try {
-      await loginUser(credentials)
+      await login(credentials)
       navigate(location.state?.from || '/', { replace: true })
     } catch (err) {
       const data = err.response?.data

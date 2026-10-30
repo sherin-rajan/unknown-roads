@@ -73,10 +73,9 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
     def validate_phone_number(self, value):
         value = value.strip()
 
-        if value and not re.fullmatch(r"\+?[0-9]{7,15}", value):
+        if value and not re.fullmatch(r"^(?:\+91)?[0-9]{10}$", value):
             raise serializers.ValidationError(
-                "Enter a valid phone number containing 10–12 digits. "
-                "An optional leading + is allowed."
+                "Enter a valid 10-digit mobile number. You may include the +91 country code."
             )
 
         return value
