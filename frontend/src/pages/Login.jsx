@@ -29,8 +29,25 @@ function Login() {
     setLoading(true)
 
     try {
-      await login(credentials)
-      navigate(location.state?.from || '/', { replace: true })
+      const currentUser = await login(credentials)
+
+      // Redirect users according to their role
+      let dashboardPath = '/dashboard'
+
+      if (currentUser.role === 'admin') {
+        dashboardPath = '/admin-dashboard'
+      } else if (currentUser.role === 'manager') {
+        dashboardPath = '/manager-dashboard'
+      }
+
+      // Respect the originally requested page for customers
+      const destination =
+        currentUser.role === 'customer'
+          ? (location.state?.from || dashboardPath)
+          : dashboardPath
+
+      navigate(destination, { replace: true })
+
     } catch (err) {
       const data = err.response?.data
 
