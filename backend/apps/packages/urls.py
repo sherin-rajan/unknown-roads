@@ -13,7 +13,15 @@ from .views import (
     GroupSizeListView,
     CustomerPackageEnquiryCreateView,
     ManagerPackageEnquiryListView,
-    ManagerPackageEnquiryDetailView,    
+    ManagerPackageEnquiryDetailView,  
+    CustomerPackageEnquiryListView,
+    CustomerPackageBookingCreateView,
+    CustomerPackageBookingListView,
+    CustomerPackageBookingDetailView,
+    ManagerPackageBookingListView,
+    ManagerPackageBookingDetailView,
+    ManagerPackageBookingStatusUpdateView,
+    CustomerPackageBookingCancelView
 )
 
 urlpatterns = [
@@ -88,5 +96,45 @@ urlpatterns = [
         "manager/enquiries/<int:pk>/",
         ManagerPackageEnquiryDetailView.as_view(),
         name="manager-package-enquiry-detail",
+    ),
+    path(
+    "my-enquiries/",
+    CustomerPackageEnquiryListView.as_view(),
+    name="customer-package-enquiry-list",
+    ),
+    path(
+    "bookings/",
+    CustomerPackageBookingCreateView.as_view(),
+    name="customer-package-booking-create",
+    ),
+    path(
+    "my-bookings/",
+    CustomerPackageBookingListView.as_view(),
+    name="customer-package-booking-list",
+    ),
+    path(
+    "my-bookings/<int:pk>/",
+    CustomerPackageBookingDetailView.as_view(),
+    name="customer-package-booking-detail",
+    ),
+    path(
+    "manager/bookings/",
+    ManagerPackageBookingListView.as_view(),
+    name="manager-package-booking-list",
+    ),
+    path(
+    "manager/bookings/<int:pk>/",
+    ManagerPackageBookingDetailView.as_view(),
+    name="manager-package-booking-detail",
+    ),
+    path(
+    "manager/bookings/<int:pk>/status/",
+    ManagerPackageBookingStatusUpdateView.as_view(),
+    name="manager-package-booking-status-update",
+    ),
+    path(
+    "my-bookings/<int:pk>/cancel/",
+    CustomerPackageBookingCancelView.as_view(),
+    name="customer-package-booking-cancel",
     ),
 ]
