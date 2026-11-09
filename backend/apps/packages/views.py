@@ -14,6 +14,10 @@ from .models import (TravelPackage,
                      PackageEnquiry, 
                      PackageBooking,
                      BookingStatusHistory)
+from apps.notifications.services import (
+    create_notification,
+    notify_managers,
+)
 from .serializers import (
     PackageCategorySerializer,
     TravelPackageListSerializer,
@@ -336,6 +340,31 @@ class ManagerPackageBookingStatusUpdateView(generics.UpdateAPIView):
             changed_by=self.request.user,
             note="Booking status updated by manager."
         )
+        notification_details = {
+            "confirmed": (
+                "Booking confirmed",
+                f"Your booking for {booking.package.name} has been confirmed.",
+            ),
+            "rejected": (
+                "Booking rejected",
+                f"Your booking for {booking.package.name} has been rejected.",
+            ),
+            "cancelled": (
+                "Booking cancelled",
+                f"Your booking for {booking.package.name} has been cancelled by the manager.",
+            ),
+        }
+
+        if new_status in notification_details:
+            title, message = notification_details[new_status]
+
+            create_notification(
+                recipient=booking.user,
+                booking=booking,
+                title=title,
+                message=message,
+                notification_type=f"booking_{new_status}",
+            )
 
 class CustomerPackageBookingCancelView(generics.GenericAPIView):
     serializer_class = CustomerPackageBookingCancelSerializer
@@ -389,6 +418,15 @@ class CustomerPackageBookingCancelView(generics.GenericAPIView):
             new_status="cancelled",
             changed_by=request.user,
             note="Booking cancelled by customer."
+        )
+        notify_managers(
+            booking=booking,
+            title="Customer cancelled booking",
+            message=(
+                f"{request.user.username} cancelled the booking "
+                f"for {booking.package.name}."
+            ),
+            notification_type="customer_cancelled",
         )
 
         return Response(

@@ -1,8 +1,8 @@
-
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
+from apps.notifications.services import create_notification
 from apps.packages.models import (
     PackageBooking,
     PackageDeparture,
@@ -85,6 +85,16 @@ class Command(BaseCommand):
                     new_status="expired",
                     changed_by=None,
                     note="Booking automatically expired after the reservation period.",
+                )
+                create_notification(
+                    recipient=booking.user,
+                    booking=booking,
+                    title="Booking expired",
+                    message=(
+                        f"Your booking for {booking.package.name} expired "
+                        "because the reservation period ended."
+                    ),
+                    notification_type="booking_expired",
                 )
 
                 expired_count += 1

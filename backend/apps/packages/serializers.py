@@ -2,6 +2,7 @@ from rest_framework import serializers
 from datetime import timedelta
 from django.db import transaction
 from django.utils import timezone
+from apps.notifications.services import notify_managers
 
 from .models import (
     PackageCategory,
@@ -485,6 +486,16 @@ class CustomerPackageBookingSerializer(serializers.ModelSerializer):
                     departure.availability_status = "full"
 
                 departure.save()
+
+            notify_managers(
+                booking=booking,
+                title="New package booking",
+                message=(
+                    f"{booking.user.username} submitted a booking "
+                    f"for {package.name}."
+                ),
+                notification_type="new_booking",
+            )
 
             return booking
 

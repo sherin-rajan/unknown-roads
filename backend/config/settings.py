@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.destinations',
+    "apps.notifications.apps.NotificationsConfig",
     "apps.trips.apps.TripsConfig",
     'apps.packages.apps.PackagesConfig',
     'accounts.apps.AccountsConfig',
