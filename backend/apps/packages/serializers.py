@@ -91,6 +91,7 @@ class TravelPackageDetailSerializer(TravelPackageListSerializer):
 
     class Meta(TravelPackageListSerializer.Meta):
         fields = TravelPackageListSerializer.Meta.fields + [
+            "description",
             "itinerary",
             "departures",
         ]
@@ -127,6 +128,7 @@ class ManagerTravelPackageSerializer(serializers.ModelSerializer):
             "duration_days",
             "duration_nights",
             "status",
+            "publication_status",
             "cover_image",
             "created_at",
             "updated_at",

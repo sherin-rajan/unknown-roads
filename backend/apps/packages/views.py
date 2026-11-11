@@ -1,7 +1,6 @@
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
-from accounts.permissions import IsManager
-from rest_framework.permissions import IsAuthenticated
+from accounts.permissions import IsManager, IsCustomer
 from django.db import transaction
 from rest_framework.response import Response
 from rest_framework import status
@@ -189,7 +188,7 @@ class GroupSizeListView(generics.ListAPIView):
 
 class CustomerPackageEnquiryCreateView(generics.CreateAPIView):
     serializer_class = PackageEnquiryCreateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def get_package(self):
         return generics.get_object_or_404(
@@ -226,7 +225,7 @@ class ManagerPackageEnquiryDetailView(generics.RetrieveUpdateAPIView):
 
 class CustomerPackageEnquiryListView(generics.ListAPIView):
     serializer_class = CustomerPackageEnquirySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def get_queryset(self):
         return PackageEnquiry.objects.filter(
@@ -237,11 +236,11 @@ class CustomerPackageEnquiryListView(generics.ListAPIView):
 
 class CustomerPackageBookingCreateView(generics.CreateAPIView):
     serializer_class = CustomerPackageBookingSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
 class CustomerPackageBookingListView(generics.ListAPIView):
     serializer_class = CustomerPackageBookingListSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def get_queryset(self):
         return (
@@ -254,7 +253,7 @@ class CustomerPackageBookingListView(generics.ListAPIView):
 
 class CustomerPackageBookingDetailView(generics.RetrieveAPIView):
     serializer_class = CustomerPackageBookingListSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def get_queryset(self):
         return (
@@ -368,7 +367,7 @@ class ManagerPackageBookingStatusUpdateView(generics.UpdateAPIView):
 
 class CustomerPackageBookingCancelView(generics.GenericAPIView):
     serializer_class = CustomerPackageBookingCancelSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def get_queryset(self):
         return PackageBooking.objects.filter(

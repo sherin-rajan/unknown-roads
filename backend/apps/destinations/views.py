@@ -1,14 +1,17 @@
-
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import status
 
+from accounts.permissions import ReadOnlyOrManager
 from .models import Destination, Category
 from .serializers import DestinationSerializer, CategorySerializer
 
+
 @api_view(['GET','POST'])
+@permission_classes([ReadOnlyOrManager])
 def destination_list(request):
     if request.method == 'GET':
         destinations = Destination.objects.all().order_by('-is_featured','-created_at')
@@ -59,8 +62,8 @@ def destination_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
+@permission_classes([ReadOnlyOrManager])
 def destination_detail(request, pk):
     try:
         destination = Destination.objects.get(pk=pk)
@@ -84,13 +87,17 @@ def destination_detail(request, pk):
         destination.delete()
         return Response({"message": "Destination deleted successfully"}, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def featured_destinations(request):
     destinations = Destination.objects.filter(is_featured=True ).order_by('-created_at')
     serializer = DestinationSerializer(destinations, many=True)
     return Response(serializer.data)
 
+
 @api_view(['GET', 'POST'])
+@permission_classes([ReadOnlyOrManager])
 def category_list(request):
     if request.method == 'GET':
         categories = Category.objects.all()
@@ -106,7 +113,9 @@ def category_list(request):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
+@permission_classes([ReadOnlyOrManager])
 def category_detail(request, pk):
     try:
         category = Category.objects.get(pk=pk)
