@@ -1,37 +1,69 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
-import { getFavorites } from '../services/favoriteService'
+import { getCustomerDashboard } from '../services/dashboardService'
 
 function Dashboard() {
   const { user } = useAuth()
 
-  const [favoriteCount, setFavoriteCount] = useState(0)
-  const [loadingFavorites, setLoadingFavorites] = useState(true)
+  const [stats, setStats] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  const loadDashboard = async () => {
+    setLoading(true)
+    setError('')
+
+    try {
+      const data = await getCustomerDashboard()
+      setStats(data)
+    } catch (err) {
+      console.error('Customer dashboard loading failed:', err)
+      setError('Unable to load your dashboard. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const loadFavoriteCount = async () => {
-      try {
-        const favorites = await getFavorites()
-        setFavoriteCount(favorites.length)
-      } catch (error) {
-        console.error('Failed to load favorite count:', error)
-      } finally {
-        setLoadingFavorites(false)
-      }
-    }
-
-    loadFavoriteCount()
+    loadDashboard()
   }, [])
+
+  const dashboardCards = [
+    {
+      icon: '🧳',
+      label: 'Total Bookings',
+      value: stats?.total_bookings,
+    },
+    {
+      icon: '🗺️',
+      label: 'Upcoming Trips',
+      value: stats?.upcoming_trips,
+    },
+    {
+      icon: '⏳',
+      label: 'Pending Bookings',
+      value: stats?.pending_bookings,
+    },
+    {
+      icon: '✉️',
+      label: 'My Enquiries',
+      value: stats?.total_enquiries,
+    },
+    {
+      icon: '🔔',
+      label: 'Unread Notifications',
+      value: stats?.unread_notifications,
+    },
+  ]
 
   return (
     <div className="app">
       <Navbar />
 
       <main className="dashboard">
-
-        {/* Welcome Section */}
         <section className="dashboard-welcome">
           <p className="section-label">YOUR TRAVEL SPACE</p>
 
@@ -40,33 +72,53 @@ function Dashboard() {
           </h1>
 
           <p>
-            Your next adventure is waiting. Manage your account,
-            revisit saved places, and discover somewhere new.
+            Keep track of your bookings, upcoming journeys,
+            and travel enquiries in one place.
           </p>
         </section>
 
-        {/* Travel Overview */}
-        <section className="dashboard-overview">
-          <div className="dashboard-overview-card">
-            <span className="dashboard-icon">❤️</span>
-            <div>
-              <h2>
-                {loadingFavorites ? '...' : favoriteCount}
-              </h2>
-              <p>Saved Destinations</p>
-            </div>
+        <section className="dashboard-section">
+          <div className="dashboard-section-heading">
+            <p className="section-label">YOUR OVERVIEW</p>
+            <h2>Your Travel Summary</h2>
           </div>
 
-          <div className="dashboard-overview-card">
-            <span className="dashboard-icon">👤</span>
-            <div>
-              <h2>Customer</h2>
-              <p>Account Type</p>
+          {loading && (
+            <p className="empty-message">
+              Loading your travel summary...
+            </p>
+          )}
+
+          {error && (
+            <div className="error-message">
+              {error}
+              <br />
+              <button
+                type="button"
+                className="dashboard-retry-button"
+                onClick={loadDashboard}
+              >
+                Try Again
+              </button>
             </div>
-          </div>
+          )}
+
+          {!loading && !error && stats && (
+            <div className="dashboard-overview">
+              {dashboardCards.map((card) => (
+                <div className="dashboard-overview-card" key={card.label}>
+                  <span className="dashboard-icon">{card.icon}</span>
+
+                  <div>
+                    <h2>{card.value}</h2>
+                    <p>{card.label}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
-        {/* Account Actions */}
         <section className="dashboard-section">
           <div className="dashboard-section-heading">
             <p className="section-label">YOUR ACCOUNT</p>
@@ -74,35 +126,26 @@ function Dashboard() {
           </div>
 
           <div className="dashboard-grid">
-
             <Link to="/profile" className="dashboard-card">
               <span className="dashboard-icon">👤</span>
               <h2>My Profile</h2>
-              <p>
-                View and update your personal information.
-              </p>
+              <p>View and update your personal information.</p>
             </Link>
 
             <Link to="/favorites" className="dashboard-card">
               <span className="dashboard-icon">❤️</span>
               <h2>Saved Destinations</h2>
-              <p>
-                Revisit the places you have added to your collection.
-              </p>
+              <p>Revisit the places you have saved.</p>
             </Link>
 
             <Link to="/change-password" className="dashboard-card">
               <span className="dashboard-icon">🔒</span>
               <h2>Change Password</h2>
-              <p>
-                Keep your account secure by updating your password.
-              </p>
+              <p>Keep your account secure.</p>
             </Link>
-
           </div>
         </section>
 
-        {/* Discover Section */}
         <section className="dashboard-discover">
           <div>
             <p className="section-label">FIND YOUR NEXT ADVENTURE</p>
@@ -117,7 +160,6 @@ function Dashboard() {
             Explore Destinations
           </Link>
         </section>
-
       </main>
     </div>
   )

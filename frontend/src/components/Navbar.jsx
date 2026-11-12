@@ -28,8 +28,13 @@ function Navbar() {
         {!loading && (
           user ? (
             <>
-              <Link to="/dashboard">Dashboard</Link>
-              <Link to="/favorites">Saved Destinations</Link>
+              <Link to={user.role === 'manager' ? '/manager-dashboard' : '/dashboard'}>
+                Dashboard
+              </Link>
+
+              {user.role === 'customer' && (
+                <Link to="/favorites">Saved Destinations</Link>
+              )}
 
               <button
                 type="button"

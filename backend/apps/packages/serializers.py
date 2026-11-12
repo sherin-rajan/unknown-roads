@@ -120,6 +120,7 @@ class ManagerTravelPackageSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
+            "cancellation_days_before",
             "main_destination",
             "categories",
             "category_ids",
@@ -522,6 +523,9 @@ class CustomerPackageBookingListSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
+    cancellation_deadline = serializers.SerializerMethodField()
+    can_cancel = serializers.SerializerMethodField()
+
     class Meta:
         model = PackageBooking
         fields = [
@@ -538,12 +542,35 @@ class CustomerPackageBookingListSerializer(serializers.ModelSerializer):
             "price_per_person",
             "total_amount",
             "booking_status",
+            "cancellation_deadline",
+            "can_cancel",
             "reservation_expires_at",
             "booked_at",
             "updated_at",
         ]
-
         read_only_fields = fields
+
+    def get_cancellation_deadline(self, obj):
+        return (
+            obj.departure.start_date
+            - timedelta(days=obj.package.cancellation_days_before)
+        )
+
+
+    def get_can_cancel(self, obj):
+        allowed_statuses = ["pending", "confirmed"]
+
+        cancellation_deadline = (
+            obj.departure.start_date
+            - timedelta(days=obj.package.cancellation_days_before)
+        )
+
+        return (
+            obj.booking_status in allowed_statuses
+            and timezone.localdate() <= cancellation_deadline
+        )
+
+
 class BookingStatusHistorySerializer(serializers.ModelSerializer):
     changed_by_username = serializers.CharField(
         source="changed_by.username",
@@ -656,6 +683,19 @@ class CustomerPackageBookingCancelSerializer(serializers.Serializer):
         if booking.booking_status not in allowed_statuses:
             raise serializers.ValidationError(
                 "Only pending or confirmed bookings can be cancelled."
+            )
+
+        cancellation_deadline = (
+            booking.departure.start_date
+            - timedelta(days=booking.package.cancellation_days_before)
+        )
+
+        if timezone.localdate() > cancellation_deadline:
+            raise serializers.ValidationError(
+                f"This booking can only be cancelled up to "
+                f"{booking.package.cancellation_days_before} days "
+                f"before departure. The cancellation deadline "
+                f"was {cancellation_deadline}."
             )
 
         return attrs

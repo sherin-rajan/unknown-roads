@@ -43,6 +43,11 @@ class TravelPackage(models.Model):
 
     name = models.CharField(max_length=200)
     description = models.TextField()
+    cancellation_days_before = models.PositiveIntegerField(
+        default=7,
+        validators=[MinValueValidator(1)],
+        help_text="Minimum number of days before departure when customers can cancel."
+    )
 
     main_destination = models.ForeignKey(
         Destination,

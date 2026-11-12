@@ -6,12 +6,19 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import UserProfile
-from .permissions import IsCustomer
+from .permissions import IsCustomer, IsManager
 from .serializers.register import (RegisterSerializer,CurrentUserSerializer,)
 from .serializers.profile import CustomerProfileSerializer
 from .serializers.password import ChangePasswordSerializer
 from apps.destinations.models import Favorite, Destination
 from .serializers.favorite import FavoriteSerializer
+from django.utils import timezone
+from apps.packages.models import (
+    TravelPackage,
+    PackageBooking,
+    PackageEnquiry,
+)
+from apps.notifications.models import Notification
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -184,3 +191,61 @@ def remove_favorite(request, favorite_id):
         {"message": "Destination removed from favorites."},
         status=status.HTTP_200_OK
     )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsCustomer])
+def customer_dashboard(request):
+    user = request.user
+    today = timezone.localdate()
+
+    bookings = PackageBooking.objects.filter(user=user)
+
+    return Response({
+        "total_bookings": bookings.count(),
+
+        "upcoming_trips": bookings.filter(
+            booking_status="confirmed",
+            departure__start_date__gte=today
+        ).count(),
+
+        "pending_bookings": bookings.filter(
+            booking_status="pending"
+        ).count(),
+
+        "total_enquiries": PackageEnquiry.objects.filter(
+            user=user
+        ).count(),
+
+        "unread_notifications": Notification.objects.filter(
+            recipient=user,
+            is_read=False
+        ).count(),
+    })
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsManager])
+def manager_dashboard(request):
+    return Response({
+        "total_packages": TravelPackage.objects.count(),
+
+        "published_packages": TravelPackage.objects.filter(
+            publication_status="published"
+        ).count(),
+
+        "total_bookings": PackageBooking.objects.count(),
+
+        "pending_bookings": PackageBooking.objects.filter(
+            booking_status="pending"
+        ).count(),
+
+        "new_enquiries": PackageEnquiry.objects.filter(
+            status="pending"
+        ).count(),
+
+        "unread_notifications": Notification.objects.filter(
+            recipient=request.user,
+            is_read=False
+        ).count(),
+    })

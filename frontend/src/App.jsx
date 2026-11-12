@@ -1,13 +1,17 @@
 import { Routes, Route } from 'react-router-dom'
+
 import Home from './pages/Home'
 import DestinationDetails from './pages/DestinationDetails'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import ManagerDashboard from './pages/ManagerDashboard'
+
 import ProtectedRoute from './components/ProtectedRoute'
 import Profile from './pages/Profile'
 import Favorites from './pages/Favorites'
 import ChangePassword from './pages/ChangePassword'
+
 import './App.css'
 
 function App() {
@@ -23,12 +27,20 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
 
-      {/* Protected customer pages */}
-      <Route element={<ProtectedRoute />}>
+      {/* Customer-only pages */}
+      <Route element={<ProtectedRoute allowedRoles={['customer']} />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/favorites" element={<Favorites />} />
         <Route path="/change-password" element={<ChangePassword />} />
+      </Route>
+
+      {/* Manager-only pages */}
+      <Route element={<ProtectedRoute allowedRoles={['manager']} />}>
+        <Route
+          path="/manager-dashboard"
+          element={<ManagerDashboard />}
+        />
       </Route>
     </Routes>
   )

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "apps.trips.apps.TripsConfig",
     'apps.packages.apps.PackagesConfig',
     'accounts.apps.AccountsConfig',
+    "apps.reviews.apps.ReviewsConfig",
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
